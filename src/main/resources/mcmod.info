@@ -1,0 +1,23 @@
+[
+{
+  "modid": "biomeheighttweaker",
+  "name": "Biome Height Tweaker",
+  "description": "Custom biome heights",
+  "version": "${version}",
+  "mcversion": "1.9",
+  "url": "http://minecraft.curseforge.com/projects/biome-height-tweaker",
+  "updateUrl": "",
+  "authorList": ["EzTerry"],
+  
+  "credits": "EzTerry - to amplify or not
+  
+Copyright (c) 2016, ezterry
+This work is free. You can redistribute it and/or modify it under the terms of the Do What The Fuck You Want To Public License, Version 2, as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
+
+",
+  
+  "logoFile": "biomeheighttweaker.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
