@@ -61,11 +61,8 @@ public class ConfigGui extends GuiConfig{
      * NumberSliderEntry
      *
      * Provides a slider for numeric properties.
-     */
-	/**
-     * NumberSliderEntry
-     *
-     * Provides a slider for numeric properties.
+     * with some optimization for floats (still using double behind the scene but with formatting it to 6 decimal places some
+     * odd rounding is removed to prevent unexpected changes
      */
     public static class FloatNumberSlider extends ButtonEntry
     {
@@ -83,6 +80,8 @@ public class ConfigGui extends GuiConfig{
         @Override
         public void updateValueButtonText()
         {
+        	String s = String.format("%.6g", ((GuiSlider) this.btnValue).getValue());
+        	((GuiSlider) this.btnValue).setValue(Double.valueOf(s));
             ((GuiSlider) this.btnValue).updateSlider();
         }
 

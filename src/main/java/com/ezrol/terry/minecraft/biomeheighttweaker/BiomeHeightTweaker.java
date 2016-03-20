@@ -12,7 +12,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import org.apache.logging.log4j.Level;
 
-@Mod(modid = BiomeHeightTweaker.MODID, version = BiomeHeightTweaker.VERSION, guiFactory = "com.ezrol.terry.minecraft.biomeheighttweaker.GuiFactory")
+@Mod(
+		modid = BiomeHeightTweaker.MODID,
+		version = BiomeHeightTweaker.VERSION,
+		guiFactory = "com.ezrol.terry.minecraft.biomeheighttweaker.GuiFactory",
+		acceptableRemoteVersions = "*"
+)
 public class BiomeHeightTweaker {
 	public static final String MODID = "biomeheighttweaker";
 	public static final String VERSION = "${version}";
