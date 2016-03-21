@@ -6,6 +6,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.IModGuiFactory;
 
+/**
+ * 
+ * @author ezterry
+ *
+ *         Forge interface to define the location of the config gui
+ */
 public class GuiFactory implements IModGuiFactory {
 
 	@Override
@@ -23,8 +29,7 @@ public class GuiFactory implements IModGuiFactory {
 	}
 
 	@Override
-	public RuntimeOptionGuiHandler getHandlerFor(
-			RuntimeOptionCategoryElement element) {
+	public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
 		return null;
 	}
 

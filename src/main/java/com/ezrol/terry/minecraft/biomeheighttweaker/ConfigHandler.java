@@ -9,23 +9,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.Level;
+
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.common.config.Property.Type;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 import net.minecraftforge.fml.common.registry.GameData;
-
-import org.apache.logging.log4j.Level;
 
 public class ConfigHandler {
 	/**
 	 * Class to load and maintain the configuration
 	 */
 	private File confFile;
-	private Map<String, BiomeHeightData> biomeDefaults;
-	private Configuration cfg;
+	private Map<String, BiomeHeightData> biomeDefaults; // default values for
+														// the biomes
+	private Configuration cfg; // mod config
+	// field accessors
 	private static Field fieldBaseHeight;
 	private static Field fieldHeightVariation;
 
@@ -49,21 +50,16 @@ public class ConfigHandler {
 		}
 		try {
 			if (deob) {
-				fieldBaseHeight = BiomeGenBase.class
-						.getDeclaredField("baseHeight");
-				fieldHeightVariation = BiomeGenBase.class
-						.getDeclaredField("heightVariation");
+				fieldBaseHeight = BiomeGenBase.class.getDeclaredField("baseHeight");
+				fieldHeightVariation = BiomeGenBase.class.getDeclaredField("heightVariation");
 			} else {
-				fieldBaseHeight = BiomeGenBase.class
-						.getDeclaredField("field_76748_D");
-				fieldHeightVariation = BiomeGenBase.class
-						.getDeclaredField("field_76749_E");
+				fieldBaseHeight = BiomeGenBase.class.getDeclaredField("field_76748_D");
+				fieldHeightVariation = BiomeGenBase.class.getDeclaredField("field_76749_E");
 			}
 			fieldBaseHeight.setAccessible(true);
 			fieldHeightVariation.setAccessible(true);
 		} catch (Exception e) {
-			BiomeHeightTweaker.log(Level.FATAL,
-					"Unable to find reflected class: ");
+			BiomeHeightTweaker.log(Level.FATAL, "Unable to find reflected class: ");
 			BiomeHeightTweaker.log(Level.FATAL, e.toString());
 			Field fields[] = BiomeGenBase.class.getDeclaredFields();
 			for (int i = 0; i < fields.length; i++) {
@@ -78,34 +74,32 @@ public class ConfigHandler {
 		float cfgVariation;
 		BiomeHeightData defaultData = biomeDefaults.get(biomeName);
 
-		cfgHeight = cfg.getFloat("baseheight", BiomeHeightTweaker.MODID + "."
-				+ biomeName, defaultData.getHeight(),
-				Math.min(defaultData.getHeight(), (float) -2.5),
-				Math.max(defaultData.getHeight(), (float) 4.5),
+		// Load Height
+		cfgHeight = cfg.getFloat("baseheight", BiomeHeightTweaker.MODID + "." + biomeName, defaultData.getHeight(),
+				Math.min(defaultData.getHeight(), (float) -2.5), Math.max(defaultData.getHeight(), (float) 4.5),
 				"Biome Base Height", "biomeheighttweaker.config.biomeheight");
-		cfg.getCategory(BiomeHeightTweaker.MODID + "."
-				+ biomeName).setComment(biome.getBiomeName());
-		cfgVariation = cfg.getFloat("heightvariation", BiomeHeightTweaker.MODID
-				+ "." + biomeName, defaultData.getVariation(),
-				Math.min(defaultData.getVariation(), (float) -7.0),
-				Math.max(defaultData.getVariation(), (float) 7.0),
-				"Biome Height Variation", "biomeheighttweaker.config.biomevar");
+
+		// Set Comment on category
+		cfg.getCategory(BiomeHeightTweaker.MODID + "." + biomeName).setComment(biome.getBiomeName());
+
+		// Get Variation
+		cfgVariation = cfg.getFloat("heightvariation", BiomeHeightTweaker.MODID + "." + biomeName,
+				defaultData.getVariation(), Math.min(defaultData.getVariation(), (float) 0.0),
+				Math.max(defaultData.getVariation(), (float) 7.0), "Biome Height Variation",
+				"biomeheighttweaker.config.biomevar");
+
 		// Update base class
 		if (cfgHeight != biome.getBaseHeight()) {
 			try {
 				fieldBaseHeight.setFloat(biome, cfgHeight);
 				if (biome.getBaseHeight() != cfgHeight) {
 					BiomeHeightTweaker.log(Level.ERROR,
-							"Biome seems to be ignoring height setting: "
-									+ defaultData.getName());
-					BiomeHeightTweaker.log(Level.ERROR,
-							"Returned: " + biome.getBaseHeight() + " not "
-									+ cfgHeight);
+							"Biome seems to be ignoring height setting: " + defaultData.getName());
+					BiomeHeightTweaker.log(Level.ERROR, "Returned: " + biome.getBaseHeight() + " not " + cfgHeight);
 				}
 			} catch (Exception e) {
 				BiomeHeightTweaker.log(Level.ERROR,
-						"unexpected error setting Base Height for: "
-								+ defaultData.getName());
+						"unexpected error setting Base Height for: " + defaultData.getName());
 			}
 		}
 		if (cfgVariation != biome.getHeightVariation()) {
@@ -113,25 +107,19 @@ public class ConfigHandler {
 				fieldHeightVariation.setFloat(biome, cfgVariation);
 				if (biome.getHeightVariation() != cfgVariation) {
 					BiomeHeightTweaker.log(Level.ERROR,
-							"Biome seems to be ignoring variation setting: "
-									+ defaultData.getName());
+							"Biome seems to be ignoring variation setting: " + defaultData.getName());
 					BiomeHeightTweaker.log(Level.ERROR,
-							"Returned: " + biome.getHeightVariation() + " not "
-									+ cfgVariation);
+							"Returned: " + biome.getHeightVariation() + " not " + cfgVariation);
 				}
 			} catch (Exception e) {
 				BiomeHeightTweaker.log(Level.ERROR,
-						"unexpected error setting Height Variation for: "
-								+ defaultData.getName());
+						"unexpected error setting Height Variation for: " + defaultData.getName());
 			}
 		}
 		// debug check
 		if (BiomeHeightTweaker.logging) {
-			BiomeHeightTweaker.log(
-					Level.INFO,
-					defaultData.getName() + " set to h:"
-							+ biome.getBaseHeight() + " v: "
-							+ biome.getHeightVariation());
+			BiomeHeightTweaker.log(Level.INFO,
+					defaultData.getName() + " set to h:" + biome.getBaseHeight() + " v: " + biome.getHeightVariation());
 		}
 	}
 
@@ -144,20 +132,17 @@ public class ConfigHandler {
 		// load actual config file
 		cfg.load();
 
-		//get the village generation information
-		//this can only happen on init
-		BiomeHeightTweaker.village = cfg.getBoolean(
-				"Enable Ice Plains Village", BiomeHeightTweaker.MODID, false,
-				"Generated villages in Ice Plains biomes",
-				"biomeheighttweaker.config.village");
-		//"update" the configs to load the rest
+		// get the village generation information
+		// this can only happen on init
+		BiomeHeightTweaker.village = cfg.getBoolean("Enable Ice Plains Village", BiomeHeightTweaker.MODID, false,
+				"Generated villages in Ice Plains biomes", "biomeheighttweaker.config.village");
+		// "update" the configs to load the rest
 		configUpdated();
 
 	}
 
 	public void configUpdated() {
-		FMLControlledNamespacedRegistry<BiomeGenBase> biomeRegister = GameData
-				.getBiomeRegistry();
+		FMLControlledNamespacedRegistry<BiomeGenBase> biomeRegister = GameData.getBiomeRegistry();
 		Iterator<BiomeGenBase> biomeitr = biomeRegister.iterator();
 		BiomeGenBase biome;
 		BiomeHeightData defaultData;
@@ -167,60 +152,57 @@ public class ConfigHandler {
 		while (biomeitr.hasNext()) {
 			biome = biomeitr.next();
 			biomeName = biomeRegister.getNameForObjectBypass(biome).toString();
-			
+
 			BiomeHeightTweaker.log(Level.INFO, "Loading " + biomeName);
-			if(!biomeDefaults.containsKey(biomeName)){
-				defaultData = new BiomeHeightData(biomeName, biome.getBaseHeight(),
-						biome.getHeightVariation());
+			if (!biomeDefaults.containsKey(biomeName)) {
+				defaultData = new BiomeHeightData(biomeName, biome.getBaseHeight(), biome.getHeightVariation());
 				biomeDefaults.put(biomeName, defaultData);
-			}
-			else{
-				defaultData=biomeDefaults.get(biomeName);
+			} else {
+				defaultData = biomeDefaults.get(biomeName);
 			}
 			BiomeHeightTweaker.log(Level.INFO, "default: " + defaultData);
 
-			//get the values from the config and update if needed
+			// get the values from the config and update if needed
 			updateBiome(biomeName, biome);
 		}
 		// save cfg
 		cfg.save();
 	}
-	
+
 	public List<Object> getGuiPropList() {
 		List<Object> lst = new ArrayList<Object>();
 		Property village;
 		Property title;
 		ConfigCategory maincat = cfg.getCategory(BiomeHeightTweaker.MODID);
-		FMLControlledNamespacedRegistry<BiomeGenBase> biomeRegister = GameData
-				.getBiomeRegistry();
+		FMLControlledNamespacedRegistry<BiomeGenBase> biomeRegister = GameData.getBiomeRegistry();
 		Iterator<BiomeGenBase> biomeitr = biomeRegister.iterator();
 		BiomeGenBase biome;
 		String biomeName;
 		Set<ConfigCategory> cfgBiomeCats;
 		Iterator<ConfigCategory> cfgIter;
-		ConfigCategory biomeCat=null;
+		ConfigCategory biomeCat = null;
 
 		village = maincat.get("Enable Ice Plains Village");
 		village.setRequiresMcRestart(true);
 
 		lst.add(village);
-		
-		cfgBiomeCats=maincat.getChildren();
+
+		cfgBiomeCats = maincat.getChildren();
 		while (biomeitr.hasNext()) {
 			biome = biomeitr.next();
 			biomeName = biomeRegister.getNameForObjectBypass(biome).toString();
-			
-			cfgIter=cfgBiomeCats.iterator();
-			while(cfgIter.hasNext()){
-				biomeCat=cfgIter.next();
-				if(biomeCat.getName().equals(biomeName)){
+
+			cfgIter = cfgBiomeCats.iterator();
+			while (cfgIter.hasNext()) {
+				biomeCat = cfgIter.next();
+				if (biomeCat.getName().equals(biomeName)) {
 					break;
 				}
 			}
-			if(biomeCat == null || (!biomeCat.getName().equals(biomeName))){
-				BiomeHeightTweaker.log(Level.ERROR,"Biome " + biomeName + " found on gui configure, but not postinit -- skipping");
-			}
-			else{
+			if (biomeCat == null || (!biomeCat.getName().equals(biomeName))) {
+				BiomeHeightTweaker.log(Level.ERROR,
+						"Biome " + biomeName + " found on gui configure, but not postinit -- skipping");
+			} else {
 				lst.add(biomeCat);
 			}
 		}
