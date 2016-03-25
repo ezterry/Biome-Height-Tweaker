@@ -46,7 +46,7 @@ public class BiomeHeightTweaker {
 
 	public static void log(Level lvl, String message) {
 		/**
-		 * mod logging funcition, only when "logging" is set to true above
+		 * mod logging function, only when "logging" is set to true above
 		 */
 		if (lvl == Level.FATAL) {
 			/* Major issue force enable logging for this and future messages */
@@ -59,8 +59,9 @@ public class BiomeHeightTweaker {
 
 	@SubscribeEvent
 	public void onConfigChanged(OnConfigChangedEvent event) {
-		log(Level.INFO, "config change" + event.modID);
-		if (event.modID.equals(MODID)) {
+		String eventModId = event.getModID();
+		log(Level.INFO, "config change" + eventModId);
+		if (eventModId.equals(MODID)) {
 			config.configUpdated();
 		}
 	}
