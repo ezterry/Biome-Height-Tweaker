@@ -16,7 +16,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 /* Build Version */
 
-def mod_vers_part = "0.2"
+def mod_vers_part = "0.3"
 def mc_vers_part = "1.9"
 
 
