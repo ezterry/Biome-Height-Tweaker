@@ -11,12 +11,12 @@ import java.util.Set;
 
 import org.apache.logging.log4j.Level;
 
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
-import net.minecraftforge.fml.common.registry.GameData;
 
 public class ConfigHandler {
 	/**
@@ -26,6 +26,8 @@ public class ConfigHandler {
 	private Map<String, BiomeHeightData> biomeDefaults; // default values for
 														// the biomes
 	private Configuration cfg; // mod config
+	private boolean firstLoad; // true on initial load from cfg
+
 	// field accessors
 	private static Field fieldBaseHeight;
 	private static Field fieldHeightVariation;
@@ -36,6 +38,7 @@ public class ConfigHandler {
 
 		confFile = f;
 		cfg = new Configuration(confFile);
+		firstLoad = true;
 		biomeDefaults = new HashMap<String, BiomeHeightData>();
 
 		/*
@@ -89,7 +92,7 @@ public class ConfigHandler {
 				"biomeheighttweaker.config.biomevar");
 
 		// Update base class
-		if (cfgHeight != biome.getBaseHeight()) {
+		if (!firstLoad || cfgHeight != biome.getBaseHeight()) {
 			try {
 				fieldBaseHeight.setFloat(biome, cfgHeight);
 				if (biome.getBaseHeight() != cfgHeight) {
@@ -102,7 +105,7 @@ public class ConfigHandler {
 						"unexpected error setting Base Height for: " + defaultData.getName());
 			}
 		}
-		if (cfgVariation != biome.getHeightVariation()) {
+		if (!firstLoad || cfgVariation != biome.getHeightVariation()) {
 			try {
 				fieldHeightVariation.setFloat(biome, cfgVariation);
 				if (biome.getHeightVariation() != cfgVariation) {
@@ -138,11 +141,12 @@ public class ConfigHandler {
 				"Generated villages in Ice Plains biomes", "biomeheighttweaker.config.village");
 		// "update" the configs to load the rest
 		configUpdated();
+		firstLoad = false;
 
 	}
 
 	public void configUpdated() {
-		FMLControlledNamespacedRegistry<BiomeGenBase> biomeRegister = GameData.getBiomeRegistry();
+		RegistryNamespaced<ResourceLocation, BiomeGenBase> biomeRegister = BiomeGenBase.biomeRegistry;
 		Iterator<BiomeGenBase> biomeitr = biomeRegister.iterator();
 		BiomeGenBase biome;
 		BiomeHeightData defaultData;
@@ -151,7 +155,7 @@ public class ConfigHandler {
 		// loop all registered biomes
 		while (biomeitr.hasNext()) {
 			biome = biomeitr.next();
-			biomeName = biomeRegister.getNameForObjectBypass(biome).toString();
+			biomeName = biomeRegister.getNameForObject(biome).toString();
 
 			BiomeHeightTweaker.log(Level.INFO, "Loading " + biomeName);
 			if (!biomeDefaults.containsKey(biomeName)) {
@@ -174,7 +178,7 @@ public class ConfigHandler {
 		Property village;
 		Property title;
 		ConfigCategory maincat = cfg.getCategory(BiomeHeightTweaker.MODID);
-		FMLControlledNamespacedRegistry<BiomeGenBase> biomeRegister = GameData.getBiomeRegistry();
+		RegistryNamespaced<ResourceLocation, BiomeGenBase> biomeRegister = BiomeGenBase.biomeRegistry;
 		Iterator<BiomeGenBase> biomeitr = biomeRegister.iterator();
 		BiomeGenBase biome;
 		String biomeName;
@@ -190,7 +194,7 @@ public class ConfigHandler {
 		cfgBiomeCats = maincat.getChildren();
 		while (biomeitr.hasNext()) {
 			biome = biomeitr.next();
-			biomeName = biomeRegister.getNameForObjectBypass(biome).toString();
+			biomeName = biomeRegister.getNameForObject(biome).toString();
 
 			cfgIter = cfgBiomeCats.iterator();
 			while (cfgIter.hasNext()) {

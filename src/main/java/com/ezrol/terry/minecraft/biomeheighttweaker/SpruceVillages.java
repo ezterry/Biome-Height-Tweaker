@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  *
  *         Class to spruce blocks to convert a village to spruce
  * 
- *         Tested with seed: 5379835038257694226 x=8882 y=7394
+ *         Tested with seed: 5379835038257694226 x=8882 z=7394
  */
 
 public class SpruceVillages {
