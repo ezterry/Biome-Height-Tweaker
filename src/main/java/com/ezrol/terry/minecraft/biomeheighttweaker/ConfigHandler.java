@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Level;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -46,25 +46,25 @@ public class ConfigHandler {
 		 * BiomeGenBase
 		 */
 		try {
-			BiomeGenBase.class.getDeclaredField("baseHeight");
+			Biome.class.getDeclaredField("baseHeight");
 			deob = true;
 		} catch (NoSuchFieldException e) {
 			deob = false;
 		}
 		try {
 			if (deob) {
-				fieldBaseHeight = BiomeGenBase.class.getDeclaredField("baseHeight");
-				fieldHeightVariation = BiomeGenBase.class.getDeclaredField("heightVariation");
+				fieldBaseHeight = Biome.class.getDeclaredField("baseHeight");
+				fieldHeightVariation = Biome.class.getDeclaredField("heightVariation");
 			} else {
-				fieldBaseHeight = BiomeGenBase.class.getDeclaredField("field_76748_D");
-				fieldHeightVariation = BiomeGenBase.class.getDeclaredField("field_76749_E");
+				fieldBaseHeight = Biome.class.getDeclaredField("field_76748_D");
+				fieldHeightVariation = Biome.class.getDeclaredField("field_76749_E");
 			}
 			fieldBaseHeight.setAccessible(true);
 			fieldHeightVariation.setAccessible(true);
 		} catch (Exception e) {
 			BiomeHeightTweaker.log(Level.FATAL, "Unable to find reflected class: ");
 			BiomeHeightTweaker.log(Level.FATAL, e.toString());
-			Field fields[] = BiomeGenBase.class.getDeclaredFields();
+			Field fields[] = Biome.class.getDeclaredFields();
 			for (int i = 0; i < fields.length; i++) {
 				BiomeHeightTweaker.log(Level.INFO, fields[i].getName());
 			}
@@ -72,7 +72,7 @@ public class ConfigHandler {
 		}
 	}
 
-	private void updateBiome(String biomeName, BiomeGenBase biome) {
+	private void updateBiome(String biomeName, Biome biome) {
 		float cfgHeight;
 		float cfgVariation;
 		BiomeHeightData defaultData = biomeDefaults.get(biomeName);
@@ -139,6 +139,10 @@ public class ConfigHandler {
 		// this can only happen on init
 		BiomeHeightTweaker.village = cfg.getBoolean("Enable Ice Plains Village", BiomeHeightTweaker.MODID, false,
 				"Generated villages in Ice Plains biomes", "biomeheighttweaker.config.village");
+		// g get the cave configutation
+		BiomeHeightTweaker.alt_caves = cfg.getBoolean("Enable Alternative Caves", BiomeHeightTweaker.MODID, false,
+				"Large caves in DEFAULT terrain generation (and/or mods that use ChunkProviderOverworld)",
+				"biomeheighttweaker.config.alt_caves");
 		// "update" the configs to load the rest
 		configUpdated();
 		firstLoad = false;
@@ -146,9 +150,9 @@ public class ConfigHandler {
 	}
 
 	public void configUpdated() {
-		RegistryNamespaced<ResourceLocation, BiomeGenBase> biomeRegister = BiomeGenBase.biomeRegistry;
-		Iterator<BiomeGenBase> biomeitr = biomeRegister.iterator();
-		BiomeGenBase biome;
+		RegistryNamespaced<ResourceLocation, Biome> biomeRegister = Biome.REGISTRY;
+		Iterator<Biome> biomeitr = biomeRegister.iterator();
+		Biome biome;
 		BiomeHeightData defaultData;
 		String biomeName;
 
@@ -176,11 +180,12 @@ public class ConfigHandler {
 	public List<Object> getGuiPropList() {
 		List<Object> lst = new ArrayList<Object>();
 		Property village;
+		Property alt_caves;
 		Property title;
 		ConfigCategory maincat = cfg.getCategory(BiomeHeightTweaker.MODID);
-		RegistryNamespaced<ResourceLocation, BiomeGenBase> biomeRegister = BiomeGenBase.biomeRegistry;
-		Iterator<BiomeGenBase> biomeitr = biomeRegister.iterator();
-		BiomeGenBase biome;
+		RegistryNamespaced<ResourceLocation, Biome> biomeRegister = Biome.REGISTRY;
+		Iterator<Biome> biomeitr = biomeRegister.iterator();
+		Biome biome;
 		String biomeName;
 		Set<ConfigCategory> cfgBiomeCats;
 		Iterator<ConfigCategory> cfgIter;
@@ -190,6 +195,11 @@ public class ConfigHandler {
 		village.setRequiresMcRestart(true);
 
 		lst.add(village);
+
+		alt_caves = maincat.get("Enable Alternative Caves");
+		alt_caves.setRequiresMcRestart(true);
+
+		lst.add(alt_caves);
 
 		cfgBiomeCats = maincat.getChildren();
 		while (biomeitr.hasNext()) {
