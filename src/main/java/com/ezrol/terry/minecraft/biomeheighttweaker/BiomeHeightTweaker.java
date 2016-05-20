@@ -108,6 +108,7 @@ public class BiomeHeightTweaker {
 			} catch (Exception e) {
 				BiomeHeightTweaker.log(Level.ERROR, "error injecting custom cave generator");
 			}
+			cavesOverride.put(provider, Boolean.valueOf(true));
 		}
 	}
 
