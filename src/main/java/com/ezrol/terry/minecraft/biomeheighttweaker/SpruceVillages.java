@@ -41,11 +41,6 @@ public class SpruceVillages {
 				event.setResult(Result.DENY);
 				return;
 			}
-			if (originalBlock == Blocks.GRAVEL) {
-				event.setReplacement(Blocks.PACKED_ICE.getDefaultState());
-				event.setResult(Result.DENY);
-				return;
-			}
 			if (originalBlock == Blocks.LOG || originalBlock == Blocks.LOG2) {
 				event.setReplacement(
 						Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.SPRUCE));
@@ -55,6 +50,11 @@ public class SpruceVillages {
 			if (originalBlock == Blocks.PLANKS) {
 				event.setReplacement(
 						Blocks.PLANKS.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.SPRUCE));
+				event.setResult(Result.DENY);
+				return;
+			}
+			if (originalBlock == Blocks.COBBLESTONE) {
+				event.setReplacement(Blocks.STONEBRICK.getDefaultState());
 				event.setResult(Result.DENY);
 				return;
 			}
