@@ -4,7 +4,7 @@
   "name": "Biome Height Tweaker",
   "description": "Custom biome heights",
   "version": "${version}",
-  "mcversion": "1.10",
+  "mcversion": "1.11",
   "url": "http://minecraft.curseforge.com/projects/biome-height-tweaker",
   "updateUrl": "",
   "authorList": ["EzTerry"],
@@ -16,7 +16,7 @@ This work is free. You can redistribute it and/or modify it under the terms of t
 
 ",
   
-  "logoFile": "biomeheighttweaker.png",
+  "logoFile": "/assets/biomeheighttweaker/logo/biomeheighttweaker.png",
   "screenshots": [],
   "dependencies": []
 }
