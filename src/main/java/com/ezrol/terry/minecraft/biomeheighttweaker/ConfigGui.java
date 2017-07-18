@@ -29,7 +29,7 @@ public class ConfigGui extends GuiConfig {
 
     public static List<IConfigElement> initList() {
         ConfigHandler config = BiomeHeightTweaker.config;
-        List<IConfigElement> lst = new ArrayList<IConfigElement>();
+        List<IConfigElement> lst = new ArrayList<>();
         Iterator<Object> prop = config.getGuiPropList().iterator();
         Object obj;
 

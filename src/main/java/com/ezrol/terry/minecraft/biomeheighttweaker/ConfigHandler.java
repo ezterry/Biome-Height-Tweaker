@@ -34,7 +34,7 @@ public class ConfigHandler {
         confFile = f;
         cfg = new Configuration(confFile);
         firstLoad = true;
-        biomeDefaults = new HashMap<String, BiomeHeightData>();
+        biomeDefaults = new HashMap<>();
 
 		/*
 		 * We need to grant ourselves access to two private methods of
@@ -179,7 +179,7 @@ public class ConfigHandler {
     }
 
     public List<Object> getGuiPropList() {
-        List<Object> lst = new ArrayList<Object>();
+        List<Object> lst = new ArrayList<>();
         Property village;
         Property alt_caves;
         ConfigCategory maincat = cfg.getCategory(BiomeHeightTweaker.MODID);

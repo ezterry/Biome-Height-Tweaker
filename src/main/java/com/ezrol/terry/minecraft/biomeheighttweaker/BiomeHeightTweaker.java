@@ -2,7 +2,7 @@ package com.ezrol.terry.minecraft.biomeheighttweaker;
 
 import net.minecraft.init.Biomes;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.ChunkProviderOverworld;
+import net.minecraft.world.gen.ChunkGeneratorOverworld;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.gen.MapGenBase;
 import net.minecraftforge.common.BiomeManager;
@@ -11,13 +11,13 @@ import net.minecraftforge.event.terraingen.InitMapGenEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
@@ -36,8 +36,10 @@ public class BiomeHeightTweaker {
     protected static boolean village = false;
     protected static boolean alt_caves = false;
 
-    private WeakHashMap<ChunkProviderOverworld, Boolean> cavesOverride = null;
+    private WeakHashMap<ChunkGeneratorOverworld, Boolean> cavesOverride = null;
     private Field fieldCaveGenerator = null;
+    private static Logger ourLogger=null;
+
 
     /**
      * output to the "log"
@@ -50,13 +52,17 @@ public class BiomeHeightTweaker {
             /* Major issue force enable logging for this and future messages */
             logging = true;
         }
+        if(ourLogger == null){
+            return;
+        }
         if (logging || lvl == Level.ERROR) {
-            FMLLog.log(BiomeHeightTweaker.MODID, lvl, message);
+            ourLogger.log(lvl, message);
         }
     }
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        ourLogger = event.getModLog();
         config = new ConfigHandler(event.getSuggestedConfigurationFile());
     }
 
@@ -83,16 +89,16 @@ public class BiomeHeightTweaker {
     /**
      * Change the cave generator in use
      **/
-    private void updateCaves(ChunkProviderOverworld provider) {
+    private void updateCaves(ChunkGeneratorOverworld provider) {
         if (alt_caves) {
             if (cavesOverride == null) {
-                cavesOverride = new WeakHashMap<ChunkProviderOverworld, Boolean>();
+                cavesOverride = new WeakHashMap<>();
 
                 try {
                     try {
-                        fieldCaveGenerator = ChunkProviderOverworld.class.getDeclaredField("caveGenerator");
+                        fieldCaveGenerator = ChunkGeneratorOverworld.class.getDeclaredField("caveGenerator");
                     } catch (NoSuchFieldException e) {
-                        fieldCaveGenerator = ChunkProviderOverworld.class.getDeclaredField("field_186003_v");
+                        fieldCaveGenerator = ChunkGeneratorOverworld.class.getDeclaredField("field_186003_v");
                     }
                     fieldCaveGenerator.setAccessible(true);
                 } catch (Exception e) {
@@ -169,10 +175,10 @@ public class BiomeHeightTweaker {
         log(Level.INFO, "test: " + prov.toString());
         if (prov instanceof ChunkProviderServer) {
             log(Level.INFO, "Got Chunk Provider Server");
-            if (((ChunkProviderServer) prov).chunkGenerator instanceof ChunkProviderOverworld) {
+            if (((ChunkProviderServer) prov).chunkGenerator instanceof ChunkGeneratorOverworld) {
                 log(Level.INFO, "Init Overworld Chunk Provider");
 
-                updateCaves((ChunkProviderOverworld) ((ChunkProviderServer) prov).chunkGenerator);
+                updateCaves((ChunkGeneratorOverworld) ((ChunkProviderServer) prov).chunkGenerator);
             } else {
                 String chunkGenerator = ((ChunkProviderServer) prov).chunkGenerator.getClass().getName();
                 if (chunkGenerator.equals("org.spongepowered.mod.world.gen.SpongeChunkGeneratorForge")) {

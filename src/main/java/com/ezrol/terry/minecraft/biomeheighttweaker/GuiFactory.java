@@ -15,24 +15,24 @@ import java.util.Set;
 @SuppressWarnings("unused")
 public class GuiFactory implements IModGuiFactory {
 
+
     @Override
     public void initialize(Minecraft minecraftInstance) {
+
     }
 
     @Override
-    public Class<? extends GuiScreen> mainConfigGuiClass() {
-        return ConfigGui.class;
+    public boolean hasConfigGui() {
+        return true;
+    }
+
+    @Override
+    public GuiScreen createConfigGui(GuiScreen parentScreen) {
+        return new ConfigGui(parentScreen);
     }
 
     @Override
     public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
         return null;
     }
-
-    @SuppressWarnings("ALL")
-    @Override
-    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
-        return null;
-    }
-
 }
