@@ -17,6 +17,7 @@ public class ConfigHandler {
     // field accessors
     private static Field fieldBaseHeight;
     private static Field fieldHeightVariation;
+    private static Field fieldBiomeName;
     // the biomes
     private final Configuration cfg; // mod config
     /**
@@ -50,12 +51,15 @@ public class ConfigHandler {
             if (deob) {
                 fieldBaseHeight = Biome.class.getDeclaredField("baseHeight");
                 fieldHeightVariation = Biome.class.getDeclaredField("heightVariation");
+                fieldBiomeName = Biome.class.getDeclaredField("biomeName");
             } else {
                 fieldBaseHeight = Biome.class.getDeclaredField("field_76748_D");
                 fieldHeightVariation = Biome.class.getDeclaredField("field_76749_E");
+                fieldBiomeName = Biome.class.getDeclaredField("field_76791_y");
             }
             fieldBaseHeight.setAccessible(true);
             fieldHeightVariation.setAccessible(true);
+            fieldBiomeName.setAccessible(true);
         } catch (Exception e) {
             BiomeHeightTweaker.log(Level.FATAL, "Unable to find reflected class: ");
             BiomeHeightTweaker.log(Level.FATAL, e.toString());
@@ -78,7 +82,14 @@ public class ConfigHandler {
                 "Biome Base Height", "biomeheighttweaker.config.biomeheight");
 
         // Set Comment on category
-        cfg.getCategory(BiomeHeightTweaker.MODID + "." + biomeName).setComment(biome.getBiomeName());
+        String biomeComment;
+        try {
+            biomeComment = (String) fieldBiomeName.get(biome);
+        } catch (IllegalAccessException e) {
+            BiomeHeightTweaker.log(Level.WARN, "Unable to display biome name");
+            biomeComment="UNKNOWN";
+        }
+        cfg.getCategory(BiomeHeightTweaker.MODID + "." + biomeName).setComment(biomeComment);
 
         // Get Variation
         cfgVariation = cfg.getFloat("heightvariation", BiomeHeightTweaker.MODID + "." + biomeName,
