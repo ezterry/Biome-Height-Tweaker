@@ -168,6 +168,32 @@ public class BiomeHeightTweaker {
         log(Level.INFO, "Cave injection done, logging level restored");
     }
 
+    private void updateCavesLostCities(ChunkProviderServer lostProvider) {
+        Boolean origLogging = logging;
+        logging = true;
+        log(Level.INFO, "Attempting to inject Large Caves into Lost Cities");
+
+        try {
+            Class LCChunkGen = Class.forName("mcjty.lostcities.dimensions.world.LostCityChunkGenerator");
+
+            Field caves = LCChunkGen.getDeclaredField("caveGenerator");
+            caves.setAccessible(true);
+            caves.set(lostProvider.chunkGenerator,
+                    TerrainGen.getModdedMapGen(new CustomGenCaves(), InitMapGenEvent.EventType.CAVE));
+        } catch (ClassNotFoundException e) {
+            log(Level.ERROR, "Unable to access LostCityChunkGenerator");
+        } catch (NoSuchFieldException e) {
+            log(Level.ERROR, "LostCityChunkGenerator Field caveGenerator not found");
+        } catch (IllegalAccessException e) {
+            log(Level.ERROR, "LostCityChunkGenerator Unable to update cave generator");
+        }
+
+
+        logging = origLogging;
+        log(Level.INFO, "Cave injection done, logging level restored");
+    }
+
+    @SuppressWarnings("IfCanBeSwitch")
     @SubscribeEvent
     public void LoadWorld(WorldEvent.Load event) {
         IChunkProvider prov = event.getWorld().getChunkProvider();
@@ -184,6 +210,10 @@ public class BiomeHeightTweaker {
                 if (chunkGenerator.equals("org.spongepowered.mod.world.gen.SpongeChunkGeneratorForge")) {
                     if (alt_caves) {
                         updateCavesSponge(((ChunkProviderServer) prov));
+                    }
+                } else if(chunkGenerator.equals("mcjty.lostcities.dimensions.world.LostCityChunkGenerator")) {
+                    if (alt_caves) {
+                        updateCavesLostCities(((ChunkProviderServer) prov));
                     }
                 } else {
                     log(Level.INFO, "chunk generator = " + chunkGenerator);
