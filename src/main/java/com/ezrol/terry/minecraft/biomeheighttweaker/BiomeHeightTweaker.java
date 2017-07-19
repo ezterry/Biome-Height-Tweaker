@@ -25,7 +25,11 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 @SuppressWarnings("WeakerAccess")
-@Mod(modid = BiomeHeightTweaker.MODID, version = BiomeHeightTweaker.VERSION, guiFactory = "com.ezrol.terry.minecraft.biomeheighttweaker.GuiFactory", acceptableRemoteVersions = "*")
+@Mod(   modid = BiomeHeightTweaker.MODID,
+        version = BiomeHeightTweaker.VERSION,
+        guiFactory = "com.ezrol.terry.minecraft.biomeheighttweaker.GuiFactory",
+        acceptableRemoteVersions = "*",
+        dependencies = "required-after:forge@[14.21.1.2406,)")
 public class BiomeHeightTweaker {
     public static final String MODID = "biomeheighttweaker";
     public static final String VERSION = "${version}";
